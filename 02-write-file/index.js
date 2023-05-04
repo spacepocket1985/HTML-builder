@@ -1,5 +1,5 @@
 
-const { stdout, stdin, exit } = process;
+const { stdout, stdin} = process;
 const path = require('path');
 const fs = require('fs');
 const filePath = path.join(__dirname, 'text.txt');
@@ -10,9 +10,9 @@ stdout.write(' ----->  Hello. Please enter your text. After you can type "exit" 
 stdin.on('data', (data) => {
   if (data.toString().trim() === 'exit') {
     stdout.write(' -----> See you later! Goodbye! <------  ')
-    exit();
+    process.exit();
   }
   writeStream.write(data);
 });
 
-process.on('SIGINT', exit);
+process.on('SIGINT', process.exit);
