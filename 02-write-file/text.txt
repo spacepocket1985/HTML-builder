@@ -1,2 +1,2 @@
-1. some text
-2. another text
+1
+2

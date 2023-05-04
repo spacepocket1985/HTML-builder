@@ -1,18 +1,23 @@
 
-const { stdout, stdin} = process;
+const { stdout, stdin } = process;
 const path = require('path');
 const fs = require('fs');
-const filePath = path.join(__dirname, 'text.txt');
+const fileName = 'text.txt';
+const filePath = path.join(__dirname, fileName);
 const writeStream = fs.createWriteStream(filePath, 'utf-8');
 
-stdout.write(' ----->  Hello. Please enter your text. After you can type "exit" to save it <------\n');
+const sayGoodBuy = () => {
+  stdout.write('-----> See you later! Goodbye! <------  ')
+  process.exit();
+}
+stdout.write('----->  Hello. Please enter your text. <------\n');
 
 stdin.on('data', (data) => {
   if (data.toString().trim() === 'exit') {
-    stdout.write(' -----> See you later! Goodbye! <------  ')
-    process.exit();
+    sayGoodBuy();
   }
   writeStream.write(data);
+  stdout.write(`-----> Yor text '${data.toString().trim()}' has been added to the file "${fileName}" <------ You can type "exit" to save it\n`);
 });
 
-process.on('SIGINT', process.exit);
+process.on('SIGINT', sayGoodBuy);
