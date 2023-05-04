@@ -7,9 +7,9 @@ const filePath = path.join(__dirname, fileName);
 const writeStream = fs.createWriteStream(filePath, 'utf-8');
 
 const sayGoodBuy = () => {
-  stdout.write('-----> See you later! Goodbye! <------  ')
+  stdout.write('-----> See you later! Goodbye! <------  ');
   process.exit();
-}
+};
 stdout.write('----->  Hello. Please enter your text. <------\n');
 
 stdin.on('data', (data) => {
