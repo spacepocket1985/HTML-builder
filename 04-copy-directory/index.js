@@ -8,7 +8,7 @@ const pathCopyDir = path.join(__dirname, 'files-copy');
 async function copyDir(dir, copyDir) {
   try {
 
-    await fs.promises.rm(copyDir, { recursive: true, force: true });
+    await fs.promises.rmdir(copyDir, { recursive: true, force: true });
     await fs.promises.mkdir(copyDir, { recursive: true });
 
     const files = await fs.promises.readdir(dir);
@@ -17,8 +17,9 @@ async function copyDir(dir, copyDir) {
       const copyPath = path.join(copyDir, file);
       await fs.promises.copyFile(mainPath, copyPath);
     }
+    stdout.write('\n ----> Directory copy completed <---- \n');
   } catch (error) {
-    stdout.write(error);
+    stdout.write('\nWe have some erroR --> ' + error.message);
   }
 }
 copyDir(pathDir, pathCopyDir);
