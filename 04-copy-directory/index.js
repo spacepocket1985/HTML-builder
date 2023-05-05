@@ -7,7 +7,8 @@ const pathCopyDir = path.join(__dirname, 'files-copy');
 
 async function copyDir(dir, copyDir) {
   try {
-
+    
+    await fs.promises.mkdir(copyDir, { recursive: true });
     await fs.promises.rmdir(copyDir, { recursive: true, force: true });
     await fs.promises.mkdir(copyDir, { recursive: true });
 
