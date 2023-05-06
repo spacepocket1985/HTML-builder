@@ -5,11 +5,19 @@ const path = require('path');
 const pathDir = path.join(__dirname, 'files');
 const pathCopyDir = path.join(__dirname, 'files-copy');
 
+async function createDir(outFolder) {
+  try {
+    await fs.promises.rm(outFolder, { recursive: true, force: true });
+    await fs.promises.mkdir(outFolder, { recursive: true });
+    stdout.write(' ----> Copy directory created <----');
+    copyDir(pathDir, pathCopyDir);
+  } catch (error) {
+    stdout.write('\nWe have some error --> ' + error.message);
+  }
+}
+  
 async function copyDir(inFolder, outFolder) {
   try {
-    //await fs.promises.mkdir(outFolder, { recursive: true });
-    await fs.promises.rmdir(outFolder, { recursive: true, force: true });
-    await fs.promises.mkdir(outFolder, { recursive: true });
 
     const files = await fs.promises.readdir(inFolder,{withFileTypes: true});
     for (let file of files) {
@@ -27,4 +35,4 @@ async function copyDir(inFolder, outFolder) {
     stdout.write('\nWe have some error --> ' + error.message);
   }
 }
-copyDir(pathDir, pathCopyDir);
+createDir(pathCopyDir);

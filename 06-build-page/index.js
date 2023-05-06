@@ -11,43 +11,47 @@ const arrayOfstyles = [];
 const pathAssets = path.join(__dirname, 'assets');
 const pathAssetsCopy = path.join(pathProjectDistFolder, 'assets');
 
-copyDir(pathAssets, pathAssetsCopy);
-
-async function copyDir(inFolder, outFolder) {
+async function createFolderProjectDist() {
   try {
-    
-    await fs.promises.mkdir(outFolder, { recursive: true });
-    await fs.promises.rmdir(outFolder, { recursive: true, force: true });
-    await fs.promises.mkdir(outFolder, { recursive: true });
-
-    const files = await fs.promises.readdir(inFolder,{withFileTypes: true});
-    for (let file of files) {
-      if (file.isDirectory()) {
-        await fs.promises.mkdir(path.join(outFolder, file.name));
-        await copyDir(path.join(inFolder, file.name), path.join(outFolder, file.name));
-
-      } else {
-        await fs.promises.copyFile(path.join(inFolder, file.name), path.join(outFolder, file.name));
-
-      }
-      // const mainPath = path.join(dir, file);
-      // const copyPath = path.join(copyDir, file);
-      // await fs.promises.copyFile(mainPath, copyPath);
-    }
-    
-  } catch (error) {
+    await fs.promises.rm(pathProjectDistFolder, { recursive: true, force: true });
+    await fs.promises.mkdir(pathProjectDistFolder, { recursive: true });
+    await createCopyDir(pathAssetsCopy);
+    stdout.write('\n---> project-dist directory created <---\n');
+  }
+  catch (error) {
     stdout.write('\nWe have some erroR --> ' + error.message);
   }
 }
 
-async function createFolderProjectDist() {
+async function createCopyDir(outFolder) {
   try {
-    // await fs.promises.mkdir(copyDir, { recursive: true });
-    // await fs.promises.rmdir(copyDir, { recursive: true, force: true });
-    await fs.promises.mkdir(pathProjectDistFolder, { recursive: true });
-    stdout.write('\n--> project-dist folder created -->\n');
+    await fs.promises.rm(outFolder, { recursive: true, force: true });
+    await fs.promises.mkdir(outFolder, { recursive: true });
+    stdout.write(' ----> Copy directory "assets" created <----');
+    await copyDir(pathAssets, pathAssetsCopy);
+  } catch (error) {
+    stdout.write('\nWe have some error --> ' + error.message);
   }
-  catch (error) {
+}
+
+async function copyDir(inFolder, outFolder) {
+  try {
+    const files = await fs.promises.readdir(inFolder, { withFileTypes: true });
+    for (let file of files) {
+      if (file.isDirectory()) {
+        await fs.promises.mkdir(path.join(outFolder, file.name));
+        await copyDir(path.join(inFolder, file.name), path.join(outFolder, file.name));
+        stdout.write(`\n ----> Copying directory --> ${file.name} completed`);
+
+      } else {
+        await fs.promises.copyFile(path.join(inFolder, file.name), path.join(outFolder, file.name));
+        stdout.write(`\n ----> Copying file -> ${file.name} completed`);
+      }
+    }
+    mergeStyles();
+    createCompomentsData();
+    workWithTepmplate();
+  } catch (error) {
     stdout.write('\nWe have some erroR --> ' + error.message);
   }
 }
@@ -56,20 +60,19 @@ async function workWithTepmplate() {
   try {
 
     let template = await fs.promises.readFile(pathTemplete, 'utf-8');
-    let tempStr;
+    let indexData;
     let componentData = await createCompomentsData();
 
-    const tempReplace = (str, obj) => { 
+    const tempReplace = (str, obj) => {
       for (let key in obj) {
         if (str.indexOf(`{{${key}}}`) != -1) {
-          tempStr = str.replace(`{{${key}}}`, obj[key]);
-          tempReplace(tempStr,obj);
+          indexData = str.replace(`{{${key}}}`, obj[key]);
+          tempReplace(indexData, obj);
         }
-      } 
+      }
     };
-    tempReplace(template,componentData);
-    //console.log(tempStr);
-    await fs.promises.writeFile(pathIndex, tempStr, 'utf8');
+    tempReplace(template, componentData);
+    await fs.promises.writeFile(pathIndex, indexData, 'utf8');
   }
 
   catch (error) {
@@ -98,7 +101,6 @@ async function createCompomentsData() {
 
 async function mergeStyles() {
   try {
-    
     await fs.promises.writeFile(pathBundle, '', 'utf8');
     const filesFromStyleFolder = await fs.promises.readdir(pathStylesFolder);
 
@@ -116,8 +118,4 @@ async function mergeStyles() {
     stdout.write('\nWe have some erroR --> ' + error.message);
   }
 }
-
-createCompomentsData();
 createFolderProjectDist();
-workWithTepmplate();
-mergeStyles();
