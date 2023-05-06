@@ -5,22 +5,26 @@ const path = require('path');
 const pathDir = path.join(__dirname, 'files');
 const pathCopyDir = path.join(__dirname, 'files-copy');
 
-async function copyDir(dir, copyDir) {
+async function copyDir(inFolder, outFolder) {
   try {
-    
-    await fs.promises.mkdir(copyDir, { recursive: true });
-    await fs.promises.rmdir(copyDir, { recursive: true, force: true });
-    await fs.promises.mkdir(copyDir, { recursive: true });
+    //await fs.promises.mkdir(outFolder, { recursive: true });
+    await fs.promises.rmdir(outFolder, { recursive: true, force: true });
+    await fs.promises.mkdir(outFolder, { recursive: true });
 
-    const files = await fs.promises.readdir(dir);
+    const files = await fs.promises.readdir(inFolder,{withFileTypes: true});
     for (let file of files) {
-      const mainPath = path.join(dir, file);
-      const copyPath = path.join(copyDir, file);
-      await fs.promises.copyFile(mainPath, copyPath);
+      if (file.isDirectory()) {
+        await fs.promises.mkdir(path.join(outFolder, file.name));
+        await copyDir(path.join(inFolder, file.name), path.join(outFolder, file.name));
+        stdout.write(`\n ----> Copying directory --> ${file.name} completed`);
+
+      } else {
+        await fs.promises.copyFile(path.join(inFolder, file.name), path.join(outFolder, file.name));
+      }
+      stdout.write(`\n ----> Copying file -> ${file.name} completed`);
     }
-    stdout.write('\n ----> Directory copy completed <---- \n');
   } catch (error) {
-    stdout.write('\nWe have some erroR --> ' + error.message);
+    stdout.write('\nWe have some error --> ' + error.message);
   }
 }
 copyDir(pathDir, pathCopyDir);
