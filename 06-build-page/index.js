@@ -13,10 +13,10 @@ const pathAssetsCopy = path.join(pathProjectDistFolder, 'assets');
 
 async function createFolderProjectDist() {
   try {
-    await fs.promises.rm(pathProjectDistFolder, { recursive: true, force: true });
+    //await fs.promises.rm(pathProjectDistFolder, { recursive: true, force: true });
     await fs.promises.mkdir(pathProjectDistFolder, { recursive: true });
-    await createCopyDir(pathAssetsCopy);
     stdout.write('\n---> project-dist directory created <---\n');
+    await createCopyDir(pathAssetsCopy);
   }
   catch (error) {
     stdout.write('\nWe have some erroR --> ' + error.message);
@@ -48,9 +48,9 @@ async function copyDir(inFolder, outFolder) {
         stdout.write(`\n ----> Copying file -> ${file.name} completed`);
       }
     }
-    mergeStyles();
-    createCompomentsData();
-    workWithTepmplate();
+    await mergeStyles();
+    await createCompomentsData();
+    await workWithTepmplate();
   } catch (error) {
     stdout.write('\nWe have some erroR --> ' + error.message);
   }
@@ -78,6 +78,7 @@ async function workWithTepmplate() {
   catch (error) {
     stdout.write('\nWe have some erroR --> ' + error.message);
   }
+
 }
 
 async function createCompomentsData() {
